@@ -2,6 +2,10 @@
 
 A simple factorio RCON client
 
+## Install
+
+pip3 install factorio-rcon-py
+
 ## Usage
 
 Example:

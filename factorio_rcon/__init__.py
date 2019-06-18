@@ -1,1 +1,1 @@
-from factorio_rcon.factorio_rcon import RCONClient, PACKET_PARSER
+from .factorio_rcon import RCONClient, AsyncRCONClient, PACKET_PARSER

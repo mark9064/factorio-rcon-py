@@ -1,3 +1,4 @@
+"""Setup information"""
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -5,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="factorio-rcon-py",
-    version="0.0.2",
+    version="1.0.0",
     author="mark9064",
     description="A simple factorio RCON client",
     long_description=LONG_DESCRIPTION,
@@ -17,7 +18,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Natural Language :: English"
     ],
 )

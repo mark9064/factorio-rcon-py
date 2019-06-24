@@ -24,7 +24,7 @@ Asynchronous usage of this module is possible with [trio](https://github.com/pyt
 Available functions in both classes are (see docstrings for more info):
 * connect - Connects to the RCON server.
 * send_packet - Sends a packet to the RCON server.
-* recieve_packets - Receives a variable number of packets from the RCON server.
+* receive_packets - Receives a variable number of packets from the RCON server.
 * send_command - Sends a single command to the RCON server.
 * send_commands - Sends multiple commands to the RCON server.
 

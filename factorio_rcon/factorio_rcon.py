@@ -374,6 +374,6 @@ ID_ERROR = "Received a packet with an ID that was not sent"
 READ_ERROR = "Connection to server timed out / closed (failed to read packet from socket)"
 WRITE_ERROR = "Connection to server timed out / closed (failed to write packet to socket)"
 SOCKET_BUSY = ("Socket cannot send/recieve simultaneously or have multiple things attempting "
-               "to read/write at the same time."
+               "to read/write at the same time. "
                "If sending multiple commands, use send_commands() rather than "
                "calling send_command() multiple times.")

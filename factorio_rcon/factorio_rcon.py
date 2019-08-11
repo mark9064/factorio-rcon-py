@@ -130,7 +130,13 @@ class RCONClient(RCONSharedBase):
             These attributes can be accessed with response.id, response.type etc.
         """
         try:
-            responses = PACKET_PARSER.parse(self.rcon_socket.recv(4096))
+            data = b""
+            while True:
+                data += self.rcon_socket.recv(4096)
+                if len(data) > 2:
+                    if data[-2:] == b"\x00\x00":
+                        break
+            responses = PACKET_PARSER.parse(data)
         except Exception:
             raise ConnectionError(READ_ERROR)
         return responses
@@ -297,9 +303,16 @@ class AsyncRCONClient(RCONSharedBase):
             These attributes can be accessed with response.id, response.type etc.
         """
         try:
-            return PACKET_PARSER.parse(await self.rcon_socket.recv(4096))
+            data = b""
+            while True:
+                data += await self.rcon_socket.recv(4096)
+                if len(data) > 2:
+                    if data[-2:] == b"\x00\x00":
+                        break
+            responses = PACKET_PARSER.parse(data)
         except Exception:
             raise ConnectionError(READ_ERROR)
+        return responses
 
     async def send_command(self, command):
         """Sends a command to the RCON server asynchronously

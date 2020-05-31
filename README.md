@@ -19,7 +19,7 @@ response = client.send_command("/help")
 All documentation is in the docstrings of each function/class. Currently,
 there is no docs website or similar but one is planned.
 
-Asynchronous usage of this module is possible with [trio](https://github.com/python-trio/trio). Use the AsyncRCONClient class. More details are in its docstring.
+Asynchronous usage of this module is possible with [anyio](https://github.com/agronholm/anyio). This means that you can use the async client with asyncio, curio and trio. Use the AsyncRCONClient class. More details are in its docstring.
 
 Available functions in both classes are (see docstrings for more info):
 * connect - Connects to the RCON server.

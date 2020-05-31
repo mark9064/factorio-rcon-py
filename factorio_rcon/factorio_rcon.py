@@ -76,7 +76,8 @@ class RCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            ConnectionError if there is an error during connection to the server.
+            OSError: if there is an error initialising the connection to the server.
+            ConnectionError: if there is an error during communication with the server.
             The error message details the exact nature of the error.
         Returns:
             Nothing returned.
@@ -112,7 +113,7 @@ class RCONClient(RCONSharedBase):
             packet_type: int; type of packet being sent.
             packet_body: str; payload for the packet (usually a command).
         Raises:
-            ConnectionError if there is an error during sending the packet.
+            ConnectionError: if there is an error during sending the packet.
             The error message details the exact nature of the error.
         Returns:
             Nothing returned.
@@ -131,7 +132,7 @@ class RCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            ConnectionError if there is an error during recieving packets.
+            ConnectionError: if there is an error during recieving packets.
             The error message details the exact nature of the error.
         Returns:
             list containing the responses received from the server.
@@ -155,13 +156,13 @@ class RCONClient(RCONSharedBase):
         """Sends a single command to the RCON server
 
         Params:
-            command: str; the command to be executed
+            command: str; the command to be executed.
         Raises:
-            OSError if socket busy
-            ConnectionError if there is an error sending/recieving the command
-            The error message details the exact nature of the error
+            OSError: if socket busy.
+            ConnectionError: if there is an error sending/recieving the command.
+            The error message details the exact nature of the error.
         Returns:
-            str if data is returned
+            str if data is returned.
             None if no data is returned.
         Extra information:
             Use send_commands if multiple commands are being executed at once,
@@ -177,13 +178,13 @@ class RCONClient(RCONSharedBase):
         """Sends multiple commands to the RCON server
 
         Params:
-            commands: dict; the dict of commands to be executed
+            commands: dict; the dict of commands to be executed.
         Raises:
-            OSError if socket busy
-            ConnectionError if there is an error sending/recieving the commands
-            The error message details the exact nature of the error
+            OSError if socket busy.
+            ConnectionError if there is an error sending/recieving the commands.
+            The error message details the exact nature of the error.
         Returns:
-            dict with original keys but the values as the responses
+            dict of format key: response.
         Extra information:
             Structure of the commands dict:
                 key: a name for identifying each command in the response
@@ -224,18 +225,20 @@ class AsyncRCONClient(RCONSharedBase):
         ip_address: str; IP address to connect to.
         port: int; port to connect to.
         password: str; password to use to authenticate.
-        connect_on_init (optional, default True): bool; connect to the server when initialised.
+        **connect_on_init is not supported**
     Raises:
-        If connect_on_init is set, see AsyncRCONClient.connect().
-        Else, no specific exceptions.
+        ImportError: if anyio is not installed.
     Extra information:
-        **All async involving this module must be done using trio.**
+        **Async involving this module is performed using anyio**
+        anyio allows you to use either asyncio, curio or trio.
         All functions in this class are async.
-        If you want to set timeouts, use trio.move_on_after or similar.
+        If you want to set timeouts, use the cancellation system your existing framework
+        provides or use anyio.move_on_after/fail_after.
+        See https://anyio.readthedocs.io/en/latest/cancellation.html#timeouts.
         If a ConnectionError is raised, it is strongly recommended to reconnect to
         the RCON server (with .connect()). However, this is not done automatically.
         The server will not respond to any RCON requests if it is saving, so you should
-        set a timeout if you are not prepared to wait a few seconds if the map is
+        setup a timeout if you are not prepared to wait a few seconds if the map is
         large or the server slow.
         """
     def __init__(self, ip_address, port, password):
@@ -253,7 +256,8 @@ class AsyncRCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            ConnectionError if there is an error during connection to the server.
+            OSError: if there is an error initialising the connection to the server.
+            ConnectionError: if there is an error during communication with the server.
             The error message details the exact nature of the error.
         Returns:
             Nothing returned.
@@ -305,7 +309,7 @@ class AsyncRCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            ConnectionError if there is an error during recieving packets.
+            ConnectionError: if there is an error during recieving packets.
             The error message details the exact nature of the error.
         Returns:
             list containing the responses received from the server.
@@ -329,13 +333,13 @@ class AsyncRCONClient(RCONSharedBase):
         """Sends a command to the RCON server asynchronously
 
         Params:
-            command: str; the command to be executed
+            command: str; the command to be executed.
         Raises:
-            OSError if socket busy
-            ConnectionError if there is an error sending/recieving the command
-            The error message details the exact nature of the error
+            OSError: if socket busy.
+            ConnectionError: if there is an error sending/recieving the command.
+            The error message details the exact nature of the error.
         Returns:
-            str if data is returned
+            str if data is returned.
             None if no data is returned.
         Extra information:
             Use send_commands if multiple commands are being executed at once,
@@ -352,13 +356,13 @@ class AsyncRCONClient(RCONSharedBase):
         """Sends a dict of commands to the RCON server asynchronously
 
         Params:
-            commands: dict; the dict of commands to be executed
+            commands: dict; the dict of commands to be executed.
         Raises:
-            OSError if socket busy
-            ConnectionError if there is an error sending/recieving the commands
-            The error message details the exact nature of the error
+            OSError: if socket busy.
+            ConnectionError: if there is an error sending/recieving the commands.
+            The error message details the exact nature of the error.
         Returns:
-            dict with original keys but the values as the responses
+            dict of format key: response.
         Extra information:
             Structure of the commands dict:
                 key: a name for identifying each command in the response

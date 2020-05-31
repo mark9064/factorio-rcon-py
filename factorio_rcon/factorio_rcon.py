@@ -3,6 +3,13 @@ import socket
 
 import construct
 
+try:
+    import anyio
+except ImportError:
+    ASYNC_AVAILABLE = False
+else:
+    ASYNC_AVAILABLE = True
+
 PACKET_PARSER = construct.GreedyRange(
     construct.Prefixed(
         construct.Int32sl,
@@ -25,7 +32,7 @@ class RCONSharedBase:
 
     def get_id(self):
         """Gets an id for a command to be sent"""
-        if self.id_seq == 2147483646: # int32 max - 1
+        if self.id_seq == 2 ** 31 - 1: # signed int32 max
             self.id_seq = 0
         self.id_seq += 1
         return self.id_seq
@@ -82,7 +89,10 @@ class RCONClient(RCONSharedBase):
         self.socket_locked = False
         self.rcon_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.rcon_socket.settimeout(self.timeout)
-        self.rcon_socket.connect((self.ip_address, self.port))
+        try:
+            self.rcon_socket.connect((self.ip_address, self.port))
+        except OSError as exc:
+            raise OSError(CONNECT_ERROR) from exc
         self.id_seq = 0
         self.send_packet(0, 3, self.password)
         responses = self.receive_packets()
@@ -112,8 +122,8 @@ class RCONClient(RCONSharedBase):
         packet = PACKET_PARSER.build([dict(id=packet_id, type=packet_type, body=packet_body)])
         try:
             self.rcon_socket.sendall(packet)
-        except Exception:
-            raise ConnectionError(WRITE_ERROR)
+        except Exception as exc:
+            raise ConnectionError(WRITE_ERROR) from exc
 
     def receive_packets(self):
         """Receives a variable number of packets from the RCON server
@@ -137,8 +147,8 @@ class RCONClient(RCONSharedBase):
                     if data[-2:] == b"\x00\x00":
                         break
             responses = PACKET_PARSER.parse(data)
-        except Exception:
-            raise ConnectionError(READ_ERROR)
+        except Exception as exc:
+            raise ConnectionError(READ_ERROR) from exc
         return responses
 
     def send_command(self, command):
@@ -228,15 +238,14 @@ class AsyncRCONClient(RCONSharedBase):
         set a timeout if you are not prepared to wait a few seconds if the map is
         large or the server slow.
         """
-    def __init__(self, ip_address, port, password, connect_on_init=True):
+    def __init__(self, ip_address, port, password):
+        if not ASYNC_AVAILABLE:
+            raise ImportError("anyio must be installed to use the async client", name="anyio")
         super().__init__()
-        import trio
-        self.trio = trio
         self.ip_address = ip_address
         self.port = port
         self.password = password
-        if connect_on_init:
-            trio.run(self.connect)
+
 
     async def connect(self):
         """Connects to the RCON server asynchronously
@@ -253,10 +262,12 @@ class AsyncRCONClient(RCONSharedBase):
             reconnect without having to create a new RCONClient.
         """
         if self.rcon_socket is not None:
-            self.rcon_socket.close()
+            await self.rcon_socket.close()
         self.socket_locked = False
-        self.rcon_socket = self.trio.socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        await self.rcon_socket.connect((self.ip_address, self.port))
+        try:
+            self.rcon_socket = await anyio.connect_tcp(self.ip_address, self.port)
+        except OSError as exc:
+            raise OSError(CONNECT_ERROR) from exc
         await self.send_packet(0, 3, self.password)
         responses = await self.receive_packets()
         for response in responses:
@@ -284,9 +295,9 @@ class AsyncRCONClient(RCONSharedBase):
         """
         packet = PACKET_PARSER.build([dict(id=packet_id, type=packet_type, body=packet_body)])
         try:
-            await self.rcon_socket.send(packet)
-        except Exception:
-            raise ConnectionError(WRITE_ERROR)
+            await self.rcon_socket.send_all(packet)
+        except Exception as exc:
+            raise ConnectionError(WRITE_ERROR) from exc
 
     async def receive_packets(self):
         """Receives a variable number of packets from the RCON server asynchronously
@@ -305,13 +316,13 @@ class AsyncRCONClient(RCONSharedBase):
         try:
             data = b""
             while True:
-                data += await self.rcon_socket.recv(4096)
+                data += await self.rcon_socket.receive_some(4096)
                 if len(data) > 2:
                     if data[-2:] == b"\x00\x00":
                         break
             responses = PACKET_PARSER.parse(data)
-        except Exception:
-            raise ConnectionError(READ_ERROR)
+        except Exception as exc:
+            raise ConnectionError(READ_ERROR) from exc
         return responses
 
     async def send_command(self, command):
@@ -335,7 +346,7 @@ class AsyncRCONClient(RCONSharedBase):
             This is especially important in an async context.
              OSError will therefore be raised if the socket is busy to avoid socket errors.
         """
-        return await self.send_commands(dict(command=command))["command"]
+        return (await self.send_commands(dict(command=command)))["command"]
 
     async def send_commands(self, commands):
         """Sends a dict of commands to the RCON server asynchronously
@@ -386,6 +397,7 @@ INVALID_PASS = "Invalid password"
 ID_ERROR = "Received a packet with an ID that was not sent"
 READ_ERROR = "Connection to server timed out / closed (failed to read packet from socket)"
 WRITE_ERROR = "Connection to server timed out / closed (failed to write packet to socket)"
+CONNECT_ERROR = "Connection to server timed out or was rejected"
 SOCKET_BUSY = ("Socket cannot send/recieve simultaneously or have multiple things attempting "
                "to read/write at the same time. "
                "If sending multiple commands, use send_commands() rather than "

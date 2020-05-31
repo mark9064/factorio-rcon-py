@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="factorio-rcon-py",
-    version="1.0.2",
+    version="1.1.0",
     author="mark9064",
     description="A simple factorio RCON client",
     long_description=LONG_DESCRIPTION,

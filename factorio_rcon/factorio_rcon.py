@@ -76,8 +76,7 @@ class RCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            OSError: if there is an error initialising the connection to the server.
-            ConnectionError: if there is an error during communication with the server.
+            ConnectionError: if there is an error connecting to or communicating with the server.
             The error message details the exact nature of the error.
         Returns:
             Nothing returned.
@@ -92,8 +91,8 @@ class RCONClient(RCONSharedBase):
         self.rcon_socket.settimeout(self.timeout)
         try:
             self.rcon_socket.connect((self.ip_address, self.port))
-        except OSError as exc:
-            raise OSError(CONNECT_ERROR) from exc
+        except ConnectionError as exc:
+            raise ConnectionError(CONNECT_ERROR) from exc
         self.id_seq = 0
         self.send_packet(0, 3, self.password)
         responses = self.receive_packets()
@@ -256,8 +255,7 @@ class AsyncRCONClient(RCONSharedBase):
         Params:
             No params.
         Raises:
-            OSError: if there is an error initialising the connection to the server.
-            ConnectionError: if there is an error during communication with the server.
+            ConnectionError: if there is an error connecting to or communicating with the server.
             The error message details the exact nature of the error.
         Returns:
             Nothing returned.
@@ -270,8 +268,8 @@ class AsyncRCONClient(RCONSharedBase):
         self.socket_locked = False
         try:
             self.rcon_socket = await anyio.connect_tcp(self.ip_address, self.port)
-        except OSError as exc:
-            raise OSError(CONNECT_ERROR) from exc
+        except ConnectionError as exc:
+            raise ConnectionError(CONNECT_ERROR) from exc
         await self.send_packet(0, 3, self.password)
         responses = await self.receive_packets()
         for response in responses:

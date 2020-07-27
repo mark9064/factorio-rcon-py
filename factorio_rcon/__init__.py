@@ -1,1 +1,5 @@
-from .factorio_rcon import RCONClient, AsyncRCONClient, PACKET_PARSER
+from .factorio_rcon import (PACKET_PARSER, RCONClient, AsyncRCONClient,
+                            RCONBaseError, ClientBusy, InvalidPassword,
+                            InvalidResponse, RCONNetworkError, RCONNotConnected,
+                            RCONClosed, RCONConnectError, RCONReceiveError,
+                            RCONSendError)

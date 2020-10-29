@@ -157,8 +157,7 @@ class RCONClient(RCONSharedBase):
         Extra information:
             Use this function to reconnect to the RCON server after an error.
         """
-        if self.rcon_socket is not None:
-            self.rcon_socket.close()
+        self.close()
         self.rcon_failure = False
         self.rcon_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.rcon_socket.settimeout(self.timeout)
@@ -368,8 +367,7 @@ class AsyncRCONClient(RCONSharedBase):
         Extra information:
             Use this function to reconnect to the RCON server after an error.
         """
-        if self.rcon_socket is not None:
-            await self.rcon_socket.close()
+        await self.close()
         self.rcon_failure = False
         try:
             self.rcon_socket = await anyio.connect_tcp(self.ip_address, self.port)
@@ -403,7 +401,7 @@ class AsyncRCONClient(RCONSharedBase):
             After closing, the client can still be reconnected using .connect().
         """
         if self.rcon_socket is not None:
-            await self.rcon_socket.close()
+            await self.rcon_socket.aclose()
             self.rcon_socket = None
 
     async def send_packet(self, packet_id, packet_type, packet_body):
@@ -422,7 +420,7 @@ class AsyncRCONClient(RCONSharedBase):
         """
         packet = PACKET_PARSER.build([dict(id=packet_id, type=packet_type, body=packet_body)])
         try:
-            await self.rcon_socket.send_all(packet)
+            await self.rcon_socket.send(packet)
         except Exception as exc:
             raise RCONSendError(SEND_ERROR) from exc
 
@@ -443,10 +441,10 @@ class AsyncRCONClient(RCONSharedBase):
         try:
             data = b""
             while True:
-                read_data = await self.rcon_socket.receive_some(4096)
-                if not read_data:
-                    raise RCONClosed(CONN_CLOSED)
-                data += read_data
+                try:
+                    data += await self.rcon_socket.receive()
+                except anyio.EndOfStream as exc:
+                    raise RCONClosed(CONN_CLOSED) from exc
                 if len(data) > 2:
                     if data.endswith(b"\x00\x00"):
                         break

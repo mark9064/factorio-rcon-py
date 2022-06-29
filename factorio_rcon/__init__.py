@@ -1,4 +1,4 @@
-from .factorio_rcon import (
+from ._factorio_rcon import (
     AsyncRCONClient,
     InvalidPassword,
     InvalidResponse,

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=62.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "factorio-rcon-py"
+version = "2.0.0"
+description = "A simple Factorio RCON client"
+dependencies = []
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    {name = "mark9064"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Natural Language :: English"
+]
+
+[project.optional-dependencies]
+async = [
+    "anyio>=3.0, <4.0"
+]
+
+[project.urls]
+homepage = "https://github.com/mark9064/factorio-rcon-py"

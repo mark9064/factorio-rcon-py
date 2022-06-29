@@ -39,4 +39,4 @@ Thanks to [Truman Kilen](https://github.com/trumank) for the initial code / idea
 
 ## License
 
-GPLV3
+LGPLv2.1

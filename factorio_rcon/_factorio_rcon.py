@@ -430,7 +430,7 @@ class AsyncRCONClient(RCONSharedBase):
         large or the server slow.
     """
 
-    rcon_socket: Optional[anyio.abc.SocketStream]
+    rcon_socket: Optional["anyio.abc.SocketStream"]
 
     def __init__(self, ip_address: str, port: int, password: str) -> None:
         if not ASYNC_AVAILABLE:

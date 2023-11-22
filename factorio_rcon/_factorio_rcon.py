@@ -3,7 +3,8 @@ import enum
 import functools
 import socket
 import struct
-from typing import Any, Callable, Dict, NamedTuple, Optional, TypeVar, cast
+from types import TracebackType
+from typing import Any, Callable, Dict, NamedTuple, Optional, TypeVar, cast, Self
 
 try:
     import anyio
@@ -402,6 +403,19 @@ class RCONClient(RCONSharedBase):
             else:
                 results[id_map[response.id]] = response.body.rstrip()
         return results
+    
+    def __enter__(self) -> Self:
+        if self.rcon_socket is None:
+            raise RCONNotConnected(NOT_CONNECTED)
+        return self
+    
+    def __exit__(
+            self, 
+            exc_type: Optional[type[BaseException]], 
+            exc_value: Optional[BaseException], 
+            traceback: Optional[TracebackType]
+        ) -> None:
+        self.close()
 
 
 class AsyncRCONClient(RCONSharedBase):
@@ -616,6 +630,17 @@ class AsyncRCONClient(RCONSharedBase):
             else:
                 results[id_map[response.id]] = response.body.rstrip()
         return results
+    
+    async def __aenter__(self) -> Self:
+        return self
+    
+    async def __aexit__(
+            self,
+            exc_type: Optional[type[BaseException]], 
+            exc_value: Optional[BaseException], 
+            traceback: Optional[TracebackType]
+        ) -> None:
+        await self.close()
 
 
 INVALID_PASS = "The RCON password is incorrect"

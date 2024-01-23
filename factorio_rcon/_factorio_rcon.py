@@ -1,5 +1,4 @@
 """RCON client for Factorio servers"""
-from __future__ import annotations
 import enum
 import functools
 import socket
@@ -405,8 +404,10 @@ class RCONClient(RCONSharedBase):
                 results[id_map[response.id]] = response.body.rstrip()
         return results
 
-    @handle_socket_errors(alive_socket_required=True)
-    def __enter__(self) -> RCONClient:
+    @handle_socket_errors(alive_socket_required=False)
+    def __enter__(self) -> "RCONClient":
+        if self.rcon_socket is None or self.rcon_failure:
+            self.connect()
         return self
 
     def __exit__(
@@ -631,8 +632,10 @@ class AsyncRCONClient(RCONSharedBase):
                 results[id_map[response.id]] = response.body.rstrip()
         return results
 
-    @handle_socket_errors(alive_socket_required=True)
-    async def __aenter__(self) -> AsyncRCONClient:
+    @async_handle_socket_errors(alive_socket_required=False)
+    async def __aenter__(self) -> "AsyncRCONClient":
+        if self.rcon_socket is None or self.rcon_failure:
+            await self.connect()
         return self
 
     async def __aexit__(

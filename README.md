@@ -12,7 +12,7 @@ With async support
 
 Async support is available as soon as the required dependency (anyio) is installed, so `pip install factorio-rcon-py anyio` is mostly equivalent, but not recommended due to dependency versioning.
 
-Python 3.7+ is required.
+Python 3.8+ is required.
 
 ## Usage
 

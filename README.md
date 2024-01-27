@@ -36,13 +36,17 @@ Available methods in both classes are (see docstrings for more info):
 * send_command - Sends a single command to the RCON server.
 * send_commands - Sends multiple commands to the RCON server.
 
+Note that both the sync/async clients can be used as sync/async context managers respectively.
+
 The methods for sending/receiving packets are available in case you want to
 write your own packet handlers, but in most cases you will never need to touch
 these and can use send_command(s).
 
 ## Mentions
 
-Thanks to [Truman Kilen](https://github.com/trumank) for the initial code / idea.
+Thanks to:
+- [Truman Kilen](https://github.com/trumank) for the initial code / idea.
+- [De Sa Léo](https://github.com/desaleo) for contributing context manager support.
 
 ## License
 

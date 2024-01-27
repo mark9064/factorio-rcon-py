@@ -189,6 +189,7 @@ class RCONClient(RCONSharedBase):
     Extra information:
         **All methods are not thread safe**
         Use AsyncRCONClient for coroutine based concurrency.
+        This is usable as a context manager.
         If any exception is raised (all inherit from RCONBaseError) during operation,
         it is required that you reconnect to the RCON server (with .connect()).
         The server will not respond to any RCON requests if it is saving, so you should
@@ -434,6 +435,7 @@ class AsyncRCONClient(RCONSharedBase):
 
         anyio allows you to use either asyncio or trio.
         All functions in this class are async.
+        This is usable as an async context manager.
         If you want to set timeouts, use the cancellation system your existing framework
         provides or use anyio.move_on_after/fail_after.
         See https://anyio.readthedocs.io/en/latest/cancellation.html#timeouts.

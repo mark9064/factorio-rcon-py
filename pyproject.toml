@@ -2,6 +2,9 @@
 requires = ["setuptools>=62.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
 [project]
 name = "factorio-rcon-py"
 version = "2.0.1"

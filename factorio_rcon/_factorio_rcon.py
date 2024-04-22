@@ -4,7 +4,7 @@ import functools
 import socket
 import struct
 from types import TracebackType
-from typing import Any, Callable, Dict, NamedTuple, Optional, TypeVar, cast
+from typing import Any, Callable, Dict, NamedTuple, Optional, Type, TypeVar, cast
 
 try:
     import anyio
@@ -413,7 +413,7 @@ class RCONClient(RCONSharedBase):
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
+        exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
@@ -642,7 +642,7 @@ class AsyncRCONClient(RCONSharedBase):
 
     async def __aexit__(
         self,
-        exc_type: Optional[type[BaseException]],
+        exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:

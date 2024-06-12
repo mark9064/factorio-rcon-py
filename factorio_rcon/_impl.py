@@ -1,4 +1,5 @@
 """RCON client for Factorio servers"""
+
 import enum
 import functools
 import socket

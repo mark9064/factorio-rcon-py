@@ -302,7 +302,10 @@ class RCONClient(RCONSharedBase):
             raise RCONSendError(SEND_ERROR) from exc
 
     def receive_exactly(self, size: int) -> bytes:
-        """Receive exactly size bytes"""
+        """Receive exactly size bytes
+
+        On socket closure: returns empty bytes
+        """
         assert self.rcon_socket is not None
         buffer = bytearray()
         while len(buffer) < size:
@@ -539,7 +542,10 @@ class AsyncRCONClient(RCONSharedBase):
             raise RCONSendError(SEND_ERROR) from exc
 
     async def receive_exactly(self, size: int) -> bytes:
-        """Receive exactly size bytes"""
+        """Receive exactly size bytes
+
+        On socket closure: raises anyio.EndOfStream
+        """
         assert self.rcon_socket is not None
         buffer = bytearray()
         while len(buffer) < size:

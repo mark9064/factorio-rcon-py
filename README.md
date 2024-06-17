@@ -46,7 +46,7 @@ these and can use send_command(s).
 
 Thanks to:
 - [Truman Kilen](https://github.com/trumank) for the initial code / idea.
-- [De Sa Léo](https://github.com/desaleo) for contributing context manager support.
+- [De Sa Léo](https://github.com/desaleo) for contributing context manager support and typing improvements.
 
 ## License
 

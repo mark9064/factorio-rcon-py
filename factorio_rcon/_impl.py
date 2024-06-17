@@ -301,15 +301,15 @@ class RCONClient(RCONSharedBase):
         except Exception as exc:
             raise RCONSendError(SEND_ERROR) from exc
 
-    def receive_exactly(self, size: int) -> bytes:
+    @staticmethod
+    def receive_exactly(rcon_socket: socket.socket, size: int) -> bytes:
         """Receive exactly size bytes
 
         On socket closure: returns empty bytes
         """
-        assert self.rcon_socket is not None
         buffer = bytearray()
         while len(buffer) < size:
-            read_data = self.rcon_socket.recv(min(size - len(buffer), RECV_SIZE))
+            read_data = rcon_socket.recv(min(size - len(buffer), RECV_SIZE))
             if not read_data:
                 return b""
             buffer.extend(read_data)
@@ -334,11 +334,11 @@ class RCONClient(RCONSharedBase):
             raise RCONNotConnected(NOT_CONNECTED)
         try:
             data = bytearray()
-            data.extend(self.receive_exactly(4))
+            data.extend(self.receive_exactly(self.rcon_socket, 4))
             if not data:
                 raise RCONClosed(CONN_CLOSED)
             length = int.from_bytes(data, "little")
-            read_data = self.receive_exactly(length)
+            read_data = self.receive_exactly(self.rcon_socket, length)
             if not read_data:
                 raise RCONClosed(CONN_CLOSED)
             data.extend(read_data)
@@ -541,16 +541,16 @@ class AsyncRCONClient(RCONSharedBase):
         except Exception as exc:
             raise RCONSendError(SEND_ERROR) from exc
 
-    async def receive_exactly(self, size: int) -> bytes:
+    @staticmethod
+    async def receive_exactly(rcon_socket: "anyio.abc.SocketStream", size: int) -> bytes:
         """Receive exactly size bytes
 
         On socket closure: raises anyio.EndOfStream
         """
-        assert self.rcon_socket is not None
         buffer = bytearray()
         while len(buffer) < size:
             buffer.extend(
-                await self.rcon_socket.receive(min(size - len(buffer), RECV_SIZE))
+                await rcon_socket.receive(min(size - len(buffer), RECV_SIZE))
             )
         return buffer
 
@@ -573,9 +573,9 @@ class AsyncRCONClient(RCONSharedBase):
             raise RCONNotConnected(NOT_CONNECTED)
         try:
             data = bytearray()
-            data.extend(await self.receive_exactly(4))
+            data.extend(await self.receive_exactly(self.rcon_socket, 4))
             length = int.from_bytes(data, "little")
-            data.extend(await self.receive_exactly(length))
+            data.extend(await self.receive_exactly(self.rcon_socket, length))
             return self.parse_message(data, length)
         except InvalidResponse:
             raise

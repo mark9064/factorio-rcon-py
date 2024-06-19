@@ -542,16 +542,16 @@ class AsyncRCONClient(RCONSharedBase):
             raise RCONSendError(SEND_ERROR) from exc
 
     @staticmethod
-    async def receive_exactly(rcon_socket: "anyio.abc.SocketStream", size: int) -> bytes:
+    async def receive_exactly(
+        rcon_socket: "anyio.abc.SocketStream", size: int
+    ) -> bytes:
         """Receive exactly size bytes
 
         On socket closure: raises anyio.EndOfStream
         """
         buffer = bytearray()
         while len(buffer) < size:
-            buffer.extend(
-                await rcon_socket.receive(min(size - len(buffer), RECV_SIZE))
-            )
+            buffer.extend(await rcon_socket.receive(min(size - len(buffer), RECV_SIZE)))
         return buffer
 
     async def receive_packet(self) -> RCONMessage:
